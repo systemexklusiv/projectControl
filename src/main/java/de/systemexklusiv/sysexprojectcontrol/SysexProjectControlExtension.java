@@ -19,8 +19,6 @@ public class SysexProjectControlExtension extends ControllerExtension
    MidiOut midiOut;
    private MidiIn midiIn;
    CursorRemoteControlsPage remoteControls;
-   private int channel = 0;
-
    protected SysexProjectControlExtension(final SysexProjectControlExtensionDefinition definition, final ControllerHost host)
    {
       super(definition, host);
@@ -41,19 +39,31 @@ public class SysexProjectControlExtension extends ControllerExtension
 
       Project project = host.getProject();
       Track rootTrackGroup = project.getRootTrackGroup();
-
+      //var remoteControls = rootTrackGroup.createCursorRemoteControlsPage("sysex-global", 32);
       remoteControls = rootTrackGroup.createCursorRemoteControlsPage(PARAMTERS_SIZE);
 
-      final HardwareSurface hardwareSurface = host.createHardwareSurface();
 
-      for (int i = 0; i < PARAMTERS_SIZE; i++) {
-//         remoteControls.getParameter(index).value().addValueObserver(128, controller.at(index));
-         AbsoluteHardwareKnob absKnob = hardwareSurface.createAbsoluteHardwareKnob ("knob_" + i);
-         absKnob.setAdjustValueMatcher (midiIn.createAbsoluteCCValueMatcher(this.channel, i));
+//      midiOut.sendMidi(15,122,16);
+//      var LOCAL_OFF = function()
+//      {
+//         sendChannelController(15, 122, 64);
+//      }
 
-         absKnob.addBinding(remoteControls.getParameter(i).value());
 
-//         remoteControls.getParameter(i).addBinding(absKnob);
+
+
+      controller = new Controller();
+
+      for (int index = 0; index < PARAMTERS_SIZE; index++) {
+         controller.append(
+                 Control.builder()
+                         .index(index)
+                         .status(176)
+                         .data1(index)
+                         .data2(0)
+                         .build()
+         );
+         remoteControls.getParameter(index).value().addValueObserver(128, controller.at(index));
       }
 
       p("SysexProjectControl Initialized");
@@ -63,14 +73,32 @@ public class SysexProjectControlExtension extends ControllerExtension
    public void flush()
    {
 
+      controller.changed().forEach(
+               c -> {
+                  p("flush: " + c );
+                  for (int i = 0; i < 16; i++) {
+                     midiOut.sendMidi(176 + i, c.getData1() + PARAMTERS_SIZE, c.getData2());
+                  }
+                  c.setChanged(false);
+               }
+              );
 
    }
 
    /** Called when we receive short MIDI message on port 0. */
    private void onMidi0(ShortMidiMessage msg)
    {
-      p(msg.toString());
+     p(msg.toString());
 
+     Optional<Control> control = controller.all().stream()
+             .filter(c -> c.getData1() == msg.getData1()).findFirst();
+
+     RemoteControl currentRemote = remoteControls.getParameter(control.get().getIndex());
+
+     if (control.isPresent() && currentRemote != null) {
+        p("Set remote param: " +  currentRemote.toString());
+        currentRemote.value().set(msg.getData2(), 128);
+     } else p("Control not present!");
    }
 
 
