@@ -2,25 +2,19 @@ package de.systemexklusiv.sysexprojectcontrol;
 
 import com.bitwig.extension.api.util.midi.ShortMidiMessage;
 import com.bitwig.extension.callback.ShortMidiMessageReceivedCallback;
-import com.bitwig.extension.controller.api.*;
 import com.bitwig.extension.controller.ControllerExtension;
-import de.systemexklusiv.sysexprojectcontrol.controller.Control;
+import com.bitwig.extension.controller.api.*;
 import de.systemexklusiv.sysexprojectcontrol.controller.CustomRemoteControlsPage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Maps a controller with CC -> status 176; data 1 1-8 to the Project Remote Controls
- * <p>
- * I am pondering on how to get more than just the 8 contrls per Bank. In my case I have
- * a livid Instrumets Code and I like to have all 32 knobs at one controlling something
- */
 public class SysexProjectControlExtension extends ControllerExtension {
 
     public static final int PARAMTERS_SIZE = 8;
 
     public static ControllerHost host;
-    private static boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     MidiOut midiOut;
     MidiIn midiIn;

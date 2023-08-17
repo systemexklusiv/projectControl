@@ -7,5 +7,11 @@ from 1 - 32 knobs, Sending CC on Channel 1,
 where the upper left knob is ccNum 1 and the last knob hast to be ccNum 32, 
 all absolute mode.
 
+Have fun!
 
+David
 
+Checkout my music and social if you feel inclined 😉
+https://www.youtube.com/playlist
+https://www.facebook.com/david.rival.10297/
+https://www.instagram.com/systemexklusiv/
