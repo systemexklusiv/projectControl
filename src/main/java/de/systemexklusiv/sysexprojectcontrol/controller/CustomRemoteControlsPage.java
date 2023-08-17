@@ -25,8 +25,7 @@ public class CustomRemoteControlsPage {
 
     CursorRemoteControlsPage remoteControls;
 
-    public CustomRemoteControlsPage(int startCcNumAt, CursorRemoteControlsPage remoteControls)
-    {
+    public CustomRemoteControlsPage(int startCcNumAt, CursorRemoteControlsPage remoteControls) {
         this.remoteControls = remoteControls;
 
         for (int index = 0; index < PARAMTERS_SIZE; index++) {
@@ -45,65 +44,70 @@ public class CustomRemoteControlsPage {
         }
     }
 
+
     public void append(Control control) {
         this.controlsList.add(control);
     }
+
 
     public Control controlAt(int i) {
         return controlsList.get(i);
     }
 
+
     public List<Control> changed() {
         return controlsList.stream().filter(control -> control.isChanged()).collect(Collectors.toList());
     }
+
     public List<Control> all() {
         return controlsList;
+    }
+
+
+    public void updateRemoteControls(ShortMidiMessage msg) {
+
+        Optional<Control> control = this.getControlByMessage(msg);
+
+        if (control.isPresent()) {
+
+            RemoteControl currentRemote;
+
+            currentRemote = getCurrentRemote(control.get());
+
+            if (Objects.isNull(currentRemote)) {
+                p("no remote control found for index: " + control.get().getIndex());
+                return;
+            }
+
+            p("Set remote param: " + currentRemote);
+
+            currentRemote.value().set(msg.getData2(), 128);
+
+        } else p("Control not present!");
     }
 
     private Optional<Control> getControlByMessage(ShortMidiMessage msg) {
         return this.all().stream()
                 .filter(c -> c.getData1() == msg.getData1()).findFirst();
     }
-        public void updateRemoteControls(ShortMidiMessage msg) {
 
-            Optional<Control> control = this.getControlByMessage(msg);
+    private RemoteControl getCurrentRemote(Control control) {
 
-            if (control.isPresent()) {
 
-                RemoteControl currentRemote;
+        RemoteControl currentRemote;
 
-                currentRemote = getCurrentRemote(control.get());
+        try {
 
-                if (Objects.isNull(currentRemote)) {
-                    p("no remote control found for index: " + control.get().getIndex());
-                    return;
-                }
+            currentRemote = this.remoteControls.getParameter(control.getIndex());
 
-                p("Set remote param: " + currentRemote);
+        } catch (NoSuchElementException e) {
 
-                currentRemote.value().set(msg.getData2(), 128);
+            p("no remote control found for index: " + control.getIndex());
 
-            } else p("Control not present!");
+            return null;
         }
 
-        private RemoteControl getCurrentRemote(Control control) {
-
-
-
-            RemoteControl currentRemote;
-
-            try {
-
-                currentRemote = this.remoteControls.getParameter(control.getIndex());
-
-            } catch (NoSuchElementException e) {
-
-                p("no remote control found for index: " + control.getIndex());
-
-                return null;
-            }
-
-            return currentRemote;
-        }
+        return currentRemote;
+    }
 
 }

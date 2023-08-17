@@ -20,6 +20,7 @@ public class SysexProjectControlExtension extends ControllerExtension {
     public static final int PARAMTERS_SIZE = 8;
 
     public static ControllerHost host;
+    private static boolean DEBUG = false;
 
     MidiOut midiOut;
     MidiIn midiIn;
@@ -50,9 +51,15 @@ public class SysexProjectControlExtension extends ControllerExtension {
                 .createCursorRemoteControlsPage("1", PARAMTERS_SIZE, "1");
         CursorRemoteControlsPage remoteControls2 = rootTrackGroup
                 .createCursorRemoteControlsPage("2", PARAMTERS_SIZE, "2");
+        CursorRemoteControlsPage remoteControls3 = rootTrackGroup
+                .createCursorRemoteControlsPage("3", PARAMTERS_SIZE, "3");
+        CursorRemoteControlsPage remoteControls4 = rootTrackGroup
+                .createCursorRemoteControlsPage("4", PARAMTERS_SIZE, "4");
 
         customRemoteControlsPages.add(new CustomRemoteControlsPage(1, remoteControls1));
-        customRemoteControlsPages.add(new CustomRemoteControlsPage(9,remoteControls2));
+        customRemoteControlsPages.add(new CustomRemoteControlsPage(9, remoteControls2));
+        customRemoteControlsPages.add(new CustomRemoteControlsPage(17,remoteControls3));
+        customRemoteControlsPages.add(new CustomRemoteControlsPage(25,remoteControls4));
 
 
         p("SysexProjectControl Initialized");
@@ -80,7 +87,8 @@ public class SysexProjectControlExtension extends ControllerExtension {
     }
 
     public static void p(String text) {
-        host.println(text);
+        if (DEBUG)
+            host.println(text);
     }
 
     public static void p(int text) {
