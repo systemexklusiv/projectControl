@@ -64,7 +64,7 @@ public class SysexProjectControlExtension extends ControllerExtension {
         customRemoteControlsPages.stream().forEach(page -> page.changed().forEach(
                 c -> {
                     p("flush: " + c);
-                    midiOut.sendMidi(176, c.getData1(), c.getData2());
+                    midiOut.sendMidi(c.getStatus(), c.getData1(), c.getData2());
                     c.setChanged(false);
                 }
         ));

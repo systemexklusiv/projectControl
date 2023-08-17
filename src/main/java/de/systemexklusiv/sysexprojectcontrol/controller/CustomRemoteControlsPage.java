@@ -28,12 +28,23 @@ public class CustomRemoteControlsPage {
     public CustomRemoteControlsPage(int startCcNumAt, CursorRemoteControlsPage remoteControls) {
         this.remoteControls = remoteControls;
 
+        // encoder
         for (int index = 0; index < PARAMTERS_SIZE; index++) {
             int currentCcNum = startCcNumAt + index;
             this.append(
                     Control.builder()
                             .index(index)
                             .status(176)
+                            .data1(currentCcNum)
+                            .data2(0)
+                            .build()
+            );
+
+            // push function assuming its noteOn on ch 1 with pich equal to ccNum
+            this.append(
+                    Control.builder()
+                            .index(index)
+                            .status(144)
                             .data1(currentCcNum)
                             .data2(0)
                             .build()
